@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "***** Checkout the flexswitch base image *******"
-docker pull snapos/flex:flex1
+docker pull snapos/flex:flex2
 
 echo "***** Spawn 2 docker instances d_inst1 d_inst2"
 
