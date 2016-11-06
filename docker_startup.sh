@@ -4,8 +4,8 @@ docker pull snapos/flex:flex2
 
 echo "***** Spawn 2 docker instances d_inst1 d_inst2"
 
-docker run -dt --privileged --log-driver=syslog --cap-add=ALL  --name d_inst1   -P snapos/flex:flex1
-docker run -dt --privileged --log-driver=syslog --cap-add=ALL --name d_inst2 -P snapos/flex:flex1
+docker run -dt --privileged --log-driver=syslog --cap-add=ALL  --name d_inst1   -P snapos/flex:flex2
+docker run -dt --privileged --log-driver=syslog --cap-add=ALL --name d_inst2 -P snapos/flex:flex2
 
 sleep 20
 
