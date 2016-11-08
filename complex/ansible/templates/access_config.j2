@@ -1,0 +1,121 @@
+{
+    "ConfigData": {
+        "LogicalIntf": [
+            {
+                "Name": "loopback0",
+                "Type": "Loopback"
+            }
+        ],
+
+        "Port": [
+            {
+                "IntfRef": "loopback0",
+                "AdminState": "UP"
+            },
+            {
+                "IntfRef": "{{ access_interface_1 }}",
+                "Speed": {{ default_port_speed }},
+                "AdminState": "UP"
+            },
+            {
+                "IntfRef": "{{ access_interface_2 }}",
+                "Speed": {{ default_port_speed }},
+                "AdminState": "UP"
+            },
+            {
+                "IntfRef": "{{ host_interface_1 }}",
+                "Speed": {{ default_port_speed }},
+                "AdminState": "UP"
+            }
+        ],
+
+        "PolicyCondition": [
+            {
+                "Name": "PolicyCondition1",
+                "Protocol": "CONNECTED,BGP",
+                "ConditionType": "MatchDstIpPrefix",
+                "IpPrefix": "10.0.0.0/8",
+                "MaskLengthRange": "8-32"
+            }
+        ],
+
+        "PolicyStmt": [
+            {
+                "Name": "PolicyStatement1",
+                "MatchConditions": "all",
+                "Action": "permit",
+                "Conditions": ["PolicyCondition1"]
+            }
+        ],
+
+        "PolicyDefinition": [
+            {
+                "Name": "BGPPolicy",
+                "MatchType": "all",
+                "PolicyType": "BGP",
+                "Priority": 10,
+                "StatementList": [
+                    {
+                        "Priority": 1,
+                        "Statement": "PolicyStatement1"
+                    }
+                ]
+            }
+        ],
+
+        "IPv4Intf": [
+            {
+                "IntfRef": "loopback0",
+                "IpAddr": "{{ loopback_interface_1_ip }}/32",
+                "AdminState": "UP"
+            },
+            {
+                "IntfRef": "{{ access_interface_1 }}",
+                "IpAddr": "{{ access_interface_1_ip }}/{{ default_cidr_bits }}",
+                "AdminState": "UP"
+            },
+            {
+                "IntfRef": "{{ access_interface_2 }}",
+                "IpAddr": "{{ access_interface_2_ip }}/{{ default_cidr_bits }}",
+                "AdminState": "UP"
+            },
+            {
+                "IntfRef": "{{ host_interface_1 }}",
+                "IpAddr": "{{ host_interface_1_ip }}/{{ default_cidr_bits }}",
+                "AdminState": "UP"
+            }
+        ],
+
+        "BGPGlobal": [
+            {
+                "ASNum": "{{ bgp_local_as }}",
+                "RouterId": "{{ loopback_interface_1_ip }}",
+                "UseMultiplePaths": true,
+                "EBGPMaxPaths": 8,
+                "Redistribution": [
+                    {
+                        "Sources": "CONNECTED,STATIC",
+                        "Policy":"BGPPolicy"
+                    }
+                ]
+            }
+        ],
+
+        "BGPv4Neighbor": [
+            {
+                "NeighborAddress": "{{ bgp_core_peer_ip_1 }}",
+                "IntfRef": "{{ access_interface_1 }}",
+                "PeerAS": "{{ bgp_core_peer_as_1 }}",
+                "Disabled": false,
+                "BfdEnable": true
+            },
+            {
+                "NeighborAddress": "{{ bgp_core_peer_ip_2 }}",
+                "IntfRef": "{{ access_interface_2 }}",
+                "PeerAS": "{{ bgp_core_peer_as_2 }}",
+                "Disabled": false,
+                "BfdEnable": true
+            }
+        ]
+    }
+}

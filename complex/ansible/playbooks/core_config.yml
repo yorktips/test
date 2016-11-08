@@ -1,0 +1,18 @@
+---
+- hosts: core
+  remote_user: root
+  tasks:
+  - name: ensure flexswitch is running
+    service:
+      name: flexswitch
+      state: started
+  - name: configure flexswitch
+    template:
+      src: /etc/ansible/templates/core_config.j2
+      dest: /opt/flexswitch/desiredConfig.json
+      force: yes
+    notify:
+    - load flexswitch config
+  handlers:
+    - name: load flexswitch config
+      command: chdir=/opt/flexswitch/apps/cfgmon python monitor.py --applyConfig=True --cfgDir=/opt/flexswitch/
