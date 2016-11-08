@@ -1,11 +1,64 @@
-git clone https://github.com/OpenSnaproute/flexSdk.git
 
+# Complex Docker Configuration with Ansible Support
+This folder contains a more advanced configuration utilizing the Docker SnapRoute Flexswitch.  The goal here is to have a multiple router/multiple host ECMP BGP configuration that you can play around with.
+
+This configuration was initially set up using an Ubuntu workstation.  The configuration manages each container over the 172.17.0/16 address space on the `docker0` interface.  These configuration options are under the `ansible/host_vars`, and you should change them accordingly.
+
+If you want to use Ansible for this, generate a new ssh key pair, and insert the public key into the docker_startup_complex.sh script under `SSH_PUBLIC_KEY` variable.
+
+## Horrible ASCII Network Diagram
+This is how the networking will look 
+```
+    core1 <--> core2
+      | \      /  |
+      |     \ /    |
+      |   /   \   |
+      |/         \|
+    access1    access2
+       |          |
+       |          |
+      host1      host2
+    
+```
+
+Here's how the "cabling" looks
+core1-eth20 <-> core2-eth25
+core1-eth21 <-> core2-eth26
+core1-eth22 <-> access1-eth30
+core2-eth27 <-> access2-eth40
+core1-eth23 <-> access2-eth41
+core2-eth28 <-> access1-eth31
+access1-eth32 <-> host1-eth0
+access2-eth42 <-> host2-eth0
+
+## Starting the containers
+Run `docker_startup_complex.sh`
+
+## Stopping the containers
+Run `docker_kill_complex.sh`
+
+# Configuration Using Ansible
+All of the Ansible configuration files relevant to this setup is under the ansible folder.
+
+If you install ansible by a package, just install the files under ansible/ into their respective folders in /etc/ansible.  
+
+At that point you can just run `ansible-playbook access-config.yml core-config.yml` and your configuration will be complete.
+
+# Configuration Using flexSDK (Incomplete)
+**This is incomplete**
+
+First, obtain the flexSdk.  You might want to use the following commands:
+```
+git clone https://github.com/OpenSnaproute/flexSdk.git
 virtualenv env
 source env/bin/activate
-
 python flexSdk/setup.py install
+```
+Now you should have a local install of the flexSdk.
 
-python
+Now you can get in there, and run the following (this is the incomplete part):
+```
+#!/usr/bin/env python
 
 from flexswitchV2 import FlexSwitch
 import json
@@ -105,3 +158,4 @@ access2.createPolicyStmt(Name="PolicyStatement1", MatchConditions="all", Action=
 access2.createPolicyDefinition(Name="BGPPolicy", MatchType="all", PolicyType="BGP", Priority=10, StatementList=[{"Priority": 1, "Statement": "PolicyStatement1"},{"Priority": 2, "Statement": "PolicyStatement2"}]).text
 
 access2.updateBGPGlobal(vrf="global", ASNum="4200000003", RouterId="10.1.255.4", UseMultiplePaths=True, EBGPMaxPaths=8, Redistribution=redistribution).text
+```
