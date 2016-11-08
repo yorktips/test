@@ -11,7 +11,7 @@ This is how the networking will look
 ```
     core1 <--> core2
       | \      /  |
-      |     \ /    |
+      |    \ /    |
       |   /   \   |
       |/         \|
     access1    access2
@@ -21,7 +21,8 @@ This is how the networking will look
     
 ```
 
-Here's how the "cabling" looks
+Here's how the "cabling" looks:
+```
 core1-eth20 <-> core2-eth25
 core1-eth21 <-> core2-eth26
 core1-eth22 <-> access1-eth30
@@ -30,6 +31,7 @@ core1-eth23 <-> access2-eth41
 core2-eth28 <-> access1-eth31
 access1-eth32 <-> host1-eth0
 access2-eth42 <-> host2-eth0
+```
 
 ## Starting the containers
 Run `docker_startup_complex.sh`
